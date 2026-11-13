@@ -1,0 +1,12 @@
+{
+  "key":"vendor","name":"Vendor Onboarding","version":1,
+  "description":"Validates documents, checks risk, and requires compliance approval.",
+  "fields":[{"name":"vendorName","label":"Vendor name","type":"text","required":true},{"name":"riskScore","label":"Risk score (0–100)","type":"number","required":true,"min":0,"max":100},{"name":"documentsComplete","label":"Documents complete?","type":"boolean","required":true},{"name":"externalVerified","label":"External check passes?","type":"boolean","required":true},{"name":"simulateDependencyFailures","label":"Simulated provider failures","type":"number","required":false,"min":0,"max":10}],
+  "rules":[
+    {"id":"V01","priority":1,"when":{"field":"documentsComplete","op":"eq","value":false},"action":{"type":"REJECT"},"reason":"Required documents are missing"},
+    {"id":"V02","priority":2,"when":{"field":"riskScore","op":"gte","value":80},"action":{"type":"REJECT"},"reason":"High-risk vendor exceeds threshold"},
+    {"id":"V03","priority":3,"when":{"all":[{"field":"riskScore","op":"lt","value":80},{"field":"documentsComplete","op":"eq","value":true}]},"action":{"type":"VERIFY"},"reason":"Documents complete: verify external provider"}
+  ],
+  "defaultAction":{"type":"REJECT"},
+  "stages":[{"id":"compliance","label":"Compliance team approval","onApprove":{"type":"APPROVE"}}]
+}

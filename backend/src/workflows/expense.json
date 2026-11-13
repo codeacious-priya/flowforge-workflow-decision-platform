@@ -1,0 +1,15 @@
+{
+  "key":"expense", "name":"Expense Reimbursement", "version":1,
+  "description":"Amount-based approval with multi-stage manager and finance review.",
+  "fields":[{"name":"employee","label":"Employee name","type":"text","required":true},{"name":"amount","label":"Expense amount (₹)","type":"number","required":true,"min":1},{"name":"category","label":"Category","type":"select","options":["Travel","Equipment","Meals","Other"],"required":true},{"name":"hasReceipt","label":"Receipt attached?","type":"boolean","required":true}],
+  "rules":[
+    {"id":"E01","priority":1,"when":{"field":"hasReceipt","op":"eq","value":false},"action":{"type":"REJECT"},"reason":"Receipt is mandatory"},
+    {"id":"E02","priority":2,"when":{"field":"amount","op":"lte","value":5000},"action":{"type":"APPROVE"},"reason":"Expense at or below ₹5,000 auto-approval limit"},
+    {"id":"E03","priority":3,"when":{"field":"amount","op":"lte","value":50000},"action":{"type":"REVIEW","stageId":"manager"},"reason":"Manager approval required for expenses up to ₹50,000"}
+  ],
+  "defaultAction":{"type":"REVIEW","stageId":"manager"},
+  "stages":[
+    {"id":"manager","label":"Manager approval","onApprove":{"type":"REVIEW","stageId":"finance"}},
+    {"id":"finance","label":"Finance approval","onApprove":{"type":"APPROVE"}}
+  ]
+}
